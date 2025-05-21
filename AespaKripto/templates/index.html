@@ -1,803 +1,1152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital License System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Digital License System</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+  <style>
+    :root {
+      --primary-color: #007BFF;
+      --secondary-color: #00AEEF;
+      --accent-color: #28a745;
+      --bg-color: #f9f9fc;
+      --white: #ffffff;
+      --text-dark: #333;
+      --text-light: #666;
+      --border-radius: 10px;
+      --transition: all 0.3s ease-in-out;
+    }
 
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
 
-        .tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-        }
+    .header {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
 
-        .tab-button {
-            flex: 1;
-            padding: 15px 20px;
-            background: none;
-            border: none;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #6c757d;
-        }
+    .header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
 
-        .tab-button.active {
-            background: white;
-            color: #495057;
-            border-bottom: 3px solid #4facfe;
-        }
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
 
-        .tab-button:hover {
-            background: #e9ecef;
-        }
+    .tabs {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      justify-content: space-around;
+    }
 
-        .tab-content {
-            display: none;
-            padding: 30px;
-        }
+    .tab-button {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      background: none;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
 
-        .tab-content.active {
-            display: block;
-        }
+    .tab-button.active {
+      color: var(--primary-color);
+      font-weight: bold;
+      border-bottom: 3px solid var(--primary-color);
+    }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    .tab-button:hover {
+      background: #f5f5f5;
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #495057;
-        }
+    .tab-content {
+      display: none;
+      padding: 2rem;
+    }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
+    .tab-content.active {
+      display: block;
+    }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #4facfe;
-        }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
 
-        .form-group textarea {
-            height: 120px;
-            resize: vertical;
-        }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
 
-        .file-input {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            width: 100%;
-        }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
 
-        .file-input input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    }
 
-        .file-input-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            border: 2px dashed #4facfe;
-            border-radius: 8px;
-            background: #f8f9ff;
-            color: #4facfe;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
+    .file-input-label {
+      border: 2px dashed var(--primary-color);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      text-align: center;
+      color: var(--primary-color);
+      transition: var(--transition);
+      cursor: pointer;
+      background: #f8faff;
+    }
 
-        .file-input:hover .file-input-label {
-            background: #e6f3ff;
-            border-color: #0056b3;
-        }
+    .file-input:hover .file-input-label {
+      background: #eaf4ff;
+    }
 
-        .btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
+    .btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-block;
+      margin-top: 1rem;
+    }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-        }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    }
 
-        .btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+    .btn-secondary {
+      background: #ccc;
+      color: #333;
+    }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        }
+    .btn-success {
+      background: var(--accent-color);
+    }
 
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
+    .result-box {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
 
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-            color: #212529;
-        }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border-color: #c3e6cb;
+    }
 
-        .result-box {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-height: 300px;
-            overflow-y: auto;
-        }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border-color: #f5c6cb;
+    }
 
-        .success {
-            background: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
+    .warning {
+      background: #fff3cd;
+      color: #856404;
+      border-color: #ffeeba;
+    }
 
-        .error {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
 
-        .warning {
-            background: #fff3cd;
-            border-color: #ffeaa7;
-            color: #856404;
-        }
+    .key-display {
+      background: #f1f3f6;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      font-family: monospace;
+      word-break: break-all;
+      margin-top: 0.5rem;
+    }
 
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+    .progress-bar {
+      height: 8px;
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
 
-        .key-display {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            word-break: break-all;
-            margin-top: 10px;
-        }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
 
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
+    /* QR Code Styles */
+    #qrcode-display, #simple-qrcode, #ascii-qrcode {
+      margin: 20px auto;
+      text-align: center;
+    }
 
-        .status-success {
-            background: #28a745;
-        }
+    #qrcode-display canvas, #simple-qrcode canvas, #ascii-qrcode canvas {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: white;
+      max-width: 100%;
+    }
 
-        .status-error {
-            background: #dc3545;
-        }
+    .binary-output {
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 14px;
+      background: #f1f1f1;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      text-align: left;
+      max-height: 300px;
+    }
 
-        .status-warning {
-            background: #ffc107;
-        }
+    .copy-btn {
+      margin-top: 10px;
+      display: inline-block;
+      background-color: #28a745;
+      color: white;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
 
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e9ecef;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
+    .copy-btn:hover {
+      background-color: #218838;
+    }
+    
+    /* Converter Styles */
+    .converter-container {
+      background: #f8faff;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .radio-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .radio-group input[type="radio"] {
+      margin-right: 0.5rem;
+      width: auto;
+    }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-        }
-    </style>
+    @media (max-width: 768px) {
+      .tabs {
+        flex-direction: column;
+      }
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔐 Digital License System</h1>
-            <p>Secure license management with ECC encryption and audio steganography</p>
-        </div>
-
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab(event, 'keygen')">🔑 Generate Keys</button>
-            <button class="tab-button" onclick="openTab(event, 'license')">📄 Create License</button>
-            <button class="tab-button" onclick="openTab(event, 'embed')">🎵 Embed in Audio</button>
-            <button class="tab-button" onclick="openTab(event, 'verify')">✅ Verify License</button>
-        </div>
-
-        <!-- Key Generation Tab -->
-        <div id="keygen" class="tab-content active">
-            <h2>🔑 Generate ECC Key Pair</h2>
-            <p>Generate a new elliptic curve cryptography key pair for license signing and verification.</p>
-            
-            <div class="form-group">
-                <button class="btn" onclick="generateKeys()">Generate New Key Pair</button>
-            </div>
-
-            <div class="two-column">
-                <div>
-                    <h3>Private Key</h3>
-                    <div id="private-key-display" class="key-display">Click "Generate New Key Pair" to create keys</div>
-                    <button class="btn btn-secondary" onclick="downloadKey('private')" disabled>Download Private Key</button>
-                </div>
-                <div>
-                    <h3>Public Key</h3>
-                    <div id="public-key-display" class="key-display">Click "Generate New Key Pair" to create keys</div>
-                    <button class="btn btn-secondary" onclick="downloadKey('public')" disabled>Download Public Key</button>
-                </div>
-            </div>
-
-            <div id="keygen-result" class="result-box" style="display:none;"></div>
-        </div>
-
-        <!-- License Generation Tab -->
-        <div id="license" class="tab-content">
-            <h2>📄 Create Digital License</h2>
-            <p>Generate an encrypted digital license with customer information and validity period.</p>
-
-            <div class="two-column">
-                <div>
-                    <div class="form-group">
-                        <label for="customer-name">Customer Name:</label>
-                        <input type="text" id="customer-name" placeholder="Enter customer name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="customer-email">Customer Email:</label>
-                        <input type="email" id="customer-email" placeholder="Enter customer email">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="license-days">License Validity (days):</label>
-                        <input type="number" id="license-days" value="365" min="1" max="3650">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="license-features">Features (comma separated):</label>
-                        <input type="text" id="license-features" value="basic,premium,enterprise" placeholder="feature1,feature2,feature3">
-                    </div>
-                </div>
-
-                <div>
-                    <div class="form-group">
-                        <label for="private-key-input">Private Key:</label>
-                        <div class="file-input">
-                            <input type="file" id="private-key-file" accept=".pem,.txt,.key">
-                            <div class="file-input-label">
-                                📁 Upload Private Key File
-                            </div>
-                        </div>
-                        <textarea id="private-key-text" placeholder="Or paste private key here..." style="margin-top: 10px;"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <button class="btn" onclick="generateLicense()">Generate License</button>
-                <button class="btn btn-secondary" onclick="downloadLicense()" disabled id="download-license-btn">Download License</button>
-            </div>
-
-            <div id="license-result" class="result-box" style="display:none;"></div>
-        </div>
-
-        <!-- Audio Embedding Tab -->
-        <div id="embed" class="tab-content">
-            <h2>🎵 Embed License in Audio</h2>
-            <p>Hide the digital license inside an audio file using DCT steganography.</p>
-
-            <div class="two-column">
-                <div>
-                    <div class="form-group">
-                        <label for="license-file">License File:</label>
-                        <div class="file-input">
-                            <input type="file" id="license-file" accept=".dat,.txt,.license">
-                            <div class="file-input-label">
-                                📄 Upload License File
-                            </div>
-                        </div>
-                        <textarea id="license-text" placeholder="Or paste license data here..." style="margin-top: 10px;"></textarea>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="form-group">
-                        <label for="audio-file">Audio File (WAV):</label>
-                        <div class="file-input">
-                            <input type="file" id="audio-file" accept=".wav">
-                            <div class="file-input-label">
-                                🎵 Upload WAV Audio File
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <button class="btn" onclick="embedLicense()">Embed License in Audio</button>
-                <button class="btn btn-success" onclick="downloadAudio()" disabled id="download-audio-btn">Download Audio with License</button>
-            </div>
-
-            <div class="progress-bar" id="embed-progress" style="display:none;">
-                <div class="progress-fill"></div>
-            </div>
-
-            <div id="embed-result" class="result-box" style="display:none;"></div>
-        </div>
-
-        <!-- License Verification Tab -->
-        <div id="verify" class="tab-content">
-            <h2>✅ Verify License from Audio</h2>
-            <p>Extract and verify a digital license from an audio file.</p>
-
-            <div class="two-column">
-                <div>
-                    <div class="form-group">
-                        <label for="verify-audio-file">Audio File with License:</label>
-                        <div class="file-input">
-                            <input type="file" id="verify-audio-file" accept=".wav">
-                            <div class="file-input-label">
-                                🎵 Upload Audio File
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="form-group">
-                        <label for="public-key-verify">Public Key:</label>
-                        <div class="file-input">
-                            <input type="file" id="public-key-file-verify" accept=".pem,.txt,.key">
-                            <div class="file-input-label">
-                                🔑 Upload Public Key File
-                            </div>
-                        </div>
-                        <textarea id="public-key-text-verify" placeholder="Or paste public key here..." style="margin-top: 10px;"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <button class="btn" onclick="verifyLicense()">Extract & Verify License</button>
-            </div>
-
-            <div class="progress-bar" id="verify-progress" style="display:none;">
-                <div class="progress-fill"></div>
-            </div>
-
-            <div id="verify-result" class="result-box" style="display:none;"></div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>🔐 Sistem Keamanan Lisensi Digital</h1>
+      <p>Menggunakan Kriptografi ECC dan QR Code Terenkripsi dalam Audio Menggunakan DCT</p>
+    </div>
+    <div class="tabs">
+      <button class="tab-button active" onclick="openTab(event, 'keygen')">🔑 Generate Keys</button>
+      <button class="tab-button" onclick="openTab(event, 'license')">📄 Create License</button>
+      <button class="tab-button" onclick="openTab(event, 'qrcode')">🔲 Generate QR Code</button>
+      <button class="tab-button" onclick="openTab(event, 'simple-qr')">📱 QR Code ke Biner</button>
+      <button class="tab-button" onclick="openTab(event, 'advanced-qr')">🔄 Converter Tool</button>
+      <button class="tab-button" onclick="openTab(event, 'embed')">🎵 Embed in Audio</button>
+      <button class="tab-button" onclick="openTab(event, 'verify')">✅ Verify License</button>
     </div>
 
-    <script>
-        // Global variables to store generated data
-        let generatedKeys = null;
-        let generatedLicense = null;
-        let embeddedAudio = null;
+    <!-- Tab Content -->
+    <div id="keygen" class="tab-content active">
+      <h2>🔑 Generate ECC Key Pair</h2>
+      <p>Generate a new elliptic curve cryptography key pair for license signing and verification.</p>
+      <div class="form-group">
+        <button class="btn" onclick="generateKeys()">Generate New Key Pair</button>
+      </div>
+      <div class="two-column">
+        <div>
+          <h3>Private Key</h3>
+          <div id="private-key-display" class="key-display">Click "Generate New Key Pair" to create keys</div>
+          <button class="btn btn-secondary" onclick="downloadKey('private')" disabled>Download Private Key</button>
+        </div>
+        <div>
+          <h3>Public Key</h3>
+          <div id="public-key-display" class="key-display">Click "Generate New Key Pair" to create keys</div>
+          <button class="btn btn-secondary" onclick="downloadKey('public')" disabled>Download Public Key</button>
+        </div>
+      </div>
+      <div id="keygen-result" class="result-box" style="display:none;"></div>
+    </div>
 
-        // Tab switching functionality
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
+    <div id="license" class="tab-content">
+      <h2>📄 Create Digital License</h2>
+      <p>Generate an encrypted digital license with customer information and validity period.</p>
+      <div class="two-column">
+        <div>
+          <div class="form-group">
+            <label for="customer-name">Customer Name:</label>
+            <input type="text" id="customer-name" placeholder="Enter customer name">
+          </div>
+          <div class="form-group">
+            <label for="customer-email">Customer Email:</label>
+            <input type="email" id="customer-email" placeholder="Enter customer email">
+          </div>
+          <div class="form-group">
+            <label for="license-days">License Validity (days):</label>
+            <input type="number" id="license-days" value="365" min="1" max="3650">
+          </div>
+          <div class="form-group">
+            <label for="license-features">Features (comma separated):</label>
+            <input type="text" id="license-features" value="basic,premium,enterprise" placeholder="feature1,feature2,feature3">
+          </div>
+        </div>
+        <div>
+          <div class="form-group">
+            <label for="private-key-input">Private Key:</label>
+            <div class="file-input">
+              <input type="file" id="private-key-file" accept=".pem,.txt,.key" style="display:none;">
+              <div class="file-input-label" onclick="document.getElementById('private-key-file').click()">📁 Upload Private Key File</div>
+            </div>
+            <textarea id="private-key-text" placeholder="Or paste private key here..." style="margin-top: 10px; height: 120px;"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <button class="btn" onclick="generateLicense()">Generate License</button>
+        <button class="btn btn-secondary" onclick="downloadLicense()" disabled id="download-license-btn">Download License</button>
+      </div>
+      <div id="license-result" class="result-box" style="display:none;"></div>
+    </div>
 
-        // Generate ECC key pair (simulation)
-        function generateKeys() {
-            showResult('keygen-result', 'Generating ECC key pair...', '');
-            
-            // Simulate key generation
-            setTimeout(() => {
-                const privateKey = generateRandomHex(64);
-                const publicKey = '04' + generateRandomHex(128);
-                
-                generatedKeys = { private: privateKey, public: publicKey };
-                
-                document.getElementById('private-key-display').textContent = privateKey;
-                document.getElementById('public-key-display').textContent = publicKey;
-                
-                // Enable download buttons
-                document.querySelector('button[onclick="downloadKey(\'private\')"]').disabled = false;
-                document.querySelector('button[onclick="downloadKey(\'public\')"]').disabled = false;
-                
-                showResult('keygen-result', 'ECC key pair generated successfully!', 'success');
-            }, 1500);
-        }
+    <!-- QR Code Tab -->
+    <div id="qrcode" class="tab-content">
+      <h2>🔲 Generate QR Code from License</h2>
+      <p>Convert the license data to a QR code for easy distribution.</p>
+      
+      <div class="form-group">
+        <label for="license-for-qr">License Data:</label>
+        <div class="file-input">
+          <input type="file" id="license-file-qr" accept=".dat,.txt,.license" style="display:none;">
+          <div class="file-input-label" onclick="document.getElementById('license-file-qr').click()">📄 Upload License File</div>
+        </div>
+        <textarea id="license-text-qr" placeholder="Or paste license data here..." style="margin-top: 10px; height: 120px;"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <button class="btn" onclick="generateQRFromLicense()">Generate QR Code</button>
+        <button class="btn btn-secondary" onclick="downloadQRCode()" disabled id="download-qr-btn">Download QR Code</button>
+      </div>
+      
+      <!-- QR Code Display -->
+      <div id="qrcode-display"></div>
+      
+      <div class="form-group">
+        <button class="btn" onclick="convertQRToBinary('qrcode-display')" id="binaryBtn" style="display:none;">Convert to Binary</button>
+      </div>
+      
+      <div id="binaryOutputContainer" style="display:none; margin-top:20px;">
+        <pre id="binaryOutput" class="binary-output"></pre>
+        <button class="copy-btn" onclick="copyBinary('binaryOutput')">📋 Copy Binary</button>
+      </div>
+      
+      <div id="qr-result" class="result-box" style="display:none;"></div>
+    </div>
 
-        // Generate random hex string
-        function generateRandomHex(length) {
-            let result = '';
-            const characters = '0123456789abcdef';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return result;
-        }
+    <!-- Simple QR Code Tab -->
+    <div id="simple-qr" class="tab-content">
+      <h2>📱 QR Code ke Biner</h2>
+      <p>Generate QR Code dari teks atau URL dan konversi ke format biner.</p>
+      
+      <div class="form-group">
+        <label for="simpleTextInput">Masukkan teks atau URL:</label>
+        <input type="text" id="simpleTextInput" placeholder="Masukkan teks atau URL..." />
+      </div>
+      
+      <div class="form-group">
+        <button class="btn" onclick="generateSimpleQR()">Generate QR Code</button>
+      </div>
+      
+      <!-- QR Code Display -->
+      <div id="simple-qrcode"></div>
+      
+      <div class="form-group">
+        <button class="btn" onclick="convertQRToBinary('simple-qrcode')" id="simpleBinaryBtn" style="display:none;">Konversi ke Biner</button>
+      </div>
+      
+      <div id="simpleBinaryOutputContainer" style="display:none; margin-top:20px;">
+        <pre id="simpleBinaryOutput" class="binary-output"></pre>
+        <button class="copy-btn" onclick="copyBinary('simpleBinaryOutput')">📋 Salin Biner</button>
+      </div>
+      
+      <div id="simple-qr-result" class="result-box" style="display:none;"></div>
+    </div>
+    
+    <!-- Advanced QR Code & Converter Tab -->
+    <div id="advanced-qr" class="tab-content">
+      <h2>🔄 Converter Tool</h2>
+      <p>Converter untuk teks, angka, biner, dan ASCII dengan integrasi QR Code.</p>
+      
+      <div class="converter-container">
+        <div class="form-group">
+          <label for="inputType">Tipe Input:</label>
+          <div class="radio-group">
+            <label><input type="radio" name="inputType" value="text" checked> Teks</label>
+            <label><input type="radio" name="inputType" value="binary"> Biner</label>
+            <label><input type="radio" name="inputType" value="decimal"> Desimal</label>
+            <label><input type="radio" name="inputType" value="ascii"> ASCII (angka)</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="outputType">Tipe Output:</label>
+          <div class="radio-group">
+            <label><input type="radio" name="outputType" value="text" checked> Teks</label>
+            <label><input type="radio" name="outputType" value="binary"> Biner</label>
+            <label><input type="radio" name="outputType" value="decimal"> Desimal</label>
+            <label><input type="radio" name="outputType" value="ascii"> ASCII (angka)</label>
+            <label><input type="radio" name="outputType" value="qrcode"> QR Code</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="converterInput">Input:</label>
+          <textarea id="converterInput" placeholder="Masukkan nilai yang akan dikonversi..." rows="4"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <button class="btn" onclick="convertValues()">Konversi</button>
+        </div>
+        
+        <div class="form-group" id="converterOutputText">
+          <label for="converterOutput">Output:</label>
+          <textarea id="converterOutput" placeholder="Hasil konversi akan muncul di sini..." rows="4" readonly></textarea>
+          <button class="copy-btn" onclick="copyText('converterOutput')">📋 Salin Output</button>
+        </div>
+        
+        <!-- QR Code Output (only shown when QR code output is selected) -->
+        <div id="ascii-qrcode" style="display: none;"></div>
+        <div class="form-group" id="asciiQrBinaryBtn" style="display: none;">
+          <button class="btn" onclick="convertQRToBinary('ascii-qrcode')">Konversi QR ke Biner</button>
+        </div>
+        
+        <div id="asciiQrBinaryOutputContainer" style="display:none; margin-top:20px;">
+          <pre id="asciiQrBinaryOutput" class="binary-output"></pre>
+          <button class="copy-btn" onclick="copyBinary('asciiQrBinaryOutput')">📋 Salin Biner</button>
+        </div>
+      </div>
+      
+      <div id="converter-result" class="result-box" style="display:none;"></div>
+    </div>
 
-        // Download key files
-        function downloadKey(type) {
-            if (!generatedKeys) return;
-            
-            const content = generatedKeys[type];
-            const filename = `${type}_key.pem`;
-            downloadFile(content, filename);
-        }
+    <div id="embed" class="tab-content">
+      <h2>🎵 Embed License in Audio</h2>
+      <p>Hide the digital license inside an audio file using DCT steganography.</p>
+      <div class="two-column">
+        <div>
+          <div class="form-group">
+            <label for="license-file">License File:</label>
+            <div class="file-input">
+              <input type="file" id="license-file" accept=".dat,.txt,.license" style="display:none;">
+              <div class="file-input-label" onclick="document.getElementById('license-file').click()">📄 Upload License File</div>
+            </div>
+            <textarea id="license-text" placeholder="Or paste license data here..." style="margin-top: 10px; height: 120px;"></textarea>
+          </div>
+        </div>
+        <div>
+          <div class="form-group">
+            <label for="audio-file">Audio File (WAV):</label>
+            <div class="file-input">
+              <input type="file" id="audio-file" accept=".wav" style="display:none;">
+              <div class="file-input-label" onclick="document.getElementById('audio-file').click()">🎵 Upload WAV Audio File</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <button class="btn" onclick="embedLicense()">Embed License in Audio</button>
+        <button class="btn btn-success" onclick="downloadAudio()" disabled id="download-audio-btn">Download Audio with License</button>
+      </div>
+      <div class="progress-bar" id="embed-progress" style="display:none;">
+        <div class="progress-fill"></div>
+      </div>
+      <div id="embed-result" class="result-box" style="display:none;"></div>
+    </div>
 
-        // Generate license
-        function generateLicense() {
-            const customerName = document.getElementById('customer-name').value;
-            const customerEmail = document.getElementById('customer-email').value;
-            const licenseDays = document.getElementById('license-days').value;
-            const features = document.getElementById('license-features').value.split(',').map(f => f.trim());
-            
-            let privateKey = document.getElementById('private-key-text').value.trim();
-            
-            if (!customerName || !customerEmail) {
-                showResult('license-result', 'Please fill in customer name and email', 'error');
-                return;
-            }
-            
-            if (!privateKey) {
-                showResult('license-result', 'Please provide a private key', 'error');
-                return;
-            }
-            
-            showResult('license-result', 'Generating digital license...', '');
-            
-            setTimeout(() => {
-                const issueDate = new Date().toISOString().split('T')[0];
-                const expiryDate = new Date(Date.now() + parseInt(licenseDays) * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                
-                const licenseData = {
-                    customer: {
-                        name: customerName,
-                        email: customerEmail
-                    },
-                    issue_date: issueDate,
-                    expiry_date: expiryDate,
-                    license_id: generateRandomHex(16),
-                    type: "standard",
-                    features: features,
-                    hash: generateRandomHex(64)
-                };
-                
-                const licenseJson = JSON.stringify(licenseData, null, 2);
-                const encryptedLicense = btoa(licenseJson); // Base64 encoding simulation
-                
-                generatedLicense = encryptedLicense;
-                
-                document.getElementById('download-license-btn').disabled = false;
-                
-                showResult('license-result', 
-                    `License generated successfully!\n\nLicense Preview:\n${licenseJson}\n\nEncrypted License (Base64):\n${encryptedLicense}`, 
-                    'success');
-            }, 1000);
-        }
+    <div id="verify" class="tab-content">
+      <h2>✅ Verify License from Audio</h2>
+      <p>Extract and verify a digital license from an audio file.</p>
+      <div class="two-column">
+        <div>
+          <div class="form-group">
+            <label for="verify-audio-file">Audio File with License:</label>
+            <div class="file-input">
+              <input type="file" id="verify-audio-file" accept=".wav" style="display:none;">
+              <div class="file-input-label" onclick="document.getElementById('verify-audio-file').click()">🎵 Upload Audio File</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="form-group">
+            <label for="public-key-verify">Public Key:</label>
+            <div class="file-input">
+              <input type="file" id="public-key-file-verify" accept=".pem,.txt,.key" style="display:none;">
+              <div class="file-input-label" onclick="document.getElementById('public-key-file-verify').click()">🔑 Upload Public Key File</div>
+            </div>
+            <textarea id="public-key-text-verify" placeholder="Or paste public key here..." style="margin-top: 10px; height: 120px;"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <button class="btn" onclick="verifyLicense()">Extract & Verify License</button>
+      </div>
+      <div class="progress-bar" id="verify-progress" style="display:none;">
+        <div class="progress-fill"></div>
+      </div>
+      <div id="verify-result" class="result-box" style="display:none;"></div>
+    </div>
+  </div>
 
-        // Download license file
-        function downloadLicense() {
-            if (!generatedLicense) return;
-            downloadFile(generatedLicense, 'license.dat');
-        }
+  <!-- Script -->
+  <script>
+    // Global variables
+    let generatedKeys = null;
+    let generatedLicense = null;
+    let embeddedAudio = null;
+    let qrCanvases = {};
 
-        // Embed license in audio
-        function embedLicense() {
-            const audioFile = document.getElementById('audio-file').files[0];
-            let licenseData = document.getElementById('license-text').value.trim();
-            
-            if (!licenseData && document.getElementById('license-file').files[0]) {
-                const file = document.getElementById('license-file').files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    licenseData = e.target.result;
-                    performEmbed(audioFile, licenseData);
-                };
-                reader.readAsText(file);
-            } else {
-                performEmbed(audioFile, licenseData);
-            }
-        }
+    function openTab(evt, tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabName).style.display = 'block';
+      evt.currentTarget.classList.add('active');
+    }
 
-        function performEmbed(audioFile, licenseData) {
-            if (!audioFile || !licenseData) {
-                showResult('embed-result', 'Please provide both audio file and license data', 'error');
-                return;
-            }
-            
-            showProgress('embed-progress');
-            showResult('embed-result', 'Embedding license in audio using DCT steganography...', '');
-            
-            // Simulate embedding process
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                updateProgress('embed-progress', progress);
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    hideProgress('embed-progress');
-                    
-                    // Create a modified filename
-                    const originalName = audioFile.name.replace('.wav', '');
-                    embeddedAudio = {
-                        name: `${originalName}_with_license.wav`,
-                        data: audioFile // In real implementation, this would be the modified audio
-                    };
-                    
-                    document.getElementById('download-audio-btn').disabled = false;
-                    showResult('embed-result', 
-                        `License successfully embedded in audio!\n\nOriginal file: ${audioFile.name}\nEmbedded ${licenseData.length} characters of license data\n\nReady for download: ${embeddedAudio.name}`, 
-                        'success');
-                }
-            }, 200);
-        }
+    function generateKeys() {
+      showResult('keygen-result', 'Generating ECC key pair...', '');
+      setTimeout(() => {
+        const privateKey = generateRandomHex(64);
+        const publicKey = '04' + generateRandomHex(128);
+        generatedKeys = { private: privateKey, public: publicKey };
+        document.getElementById('private-key-display').textContent = privateKey;
+        document.getElementById('public-key-display').textContent = publicKey;
+        document.querySelector('[onclick="downloadKey(\'private\')"]').disabled = false;
+        document.querySelector('[onclick="downloadKey(\'public\')"]').disabled = false;
+        showResult('keygen-result', 'ECC key pair generated successfully!', 'success');
+      }, 1500);
+    }
 
-        // Download audio with embedded license
-        function downloadAudio() {
-            if (!embeddedAudio) return;
-            
-            // In real implementation, this would download the actual modified audio file
-            showResult('embed-result', 'Audio download would start here (simulation mode)', 'warning');
-        }
+    function generateRandomHex(length) {
+      let result = '';
+      const chars = '0123456789abcdef';
+      for (let i = 0; i < length; i++) result += chars[Math.floor(Math.random() * chars.length)];
+      return result;
+    }
 
-        // Verify license from audio
-        function verifyLicense() {
-            const audioFile = document.getElementById('verify-audio-file').files[0];
-            let publicKey = document.getElementById('public-key-text-verify').value.trim();
-            
-            if (!publicKey && document.getElementById('public-key-file-verify').files[0]) {
-                const file = document.getElementById('public-key-file-verify').files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    publicKey = e.target.result;
-                    performVerify(audioFile, publicKey);
-                };
-                reader.readAsText(file);
-            } else {
-                performVerify(audioFile, publicKey);
-            }
-        }
+    function downloadKey(type) {
+      if (!generatedKeys) return;
+      const content = generatedKeys[type];
+      const filename = `${type}_key.pem`;
+      downloadFile(content, filename);
+    }
 
-        function performVerify(audioFile, publicKey) {
-            if (!audioFile || !publicKey) {
-                showResult('verify-result', 'Please provide both audio file and public key', 'error');
-                return;
-            }
-            
-            showProgress('verify-progress');
-            showResult('verify-result', 'Extracting and verifying license from audio...', '');
-            
-            // Simulate verification process
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 15;
-                updateProgress('verify-progress', progress);
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    hideProgress('verify-progress');
-                    
-                    // Simulate extracted license data
-                    const extractedLicense = {
-                        customer: {
-                            name: "John Doe",
-                            email: "john.doe@example.com"
-                        },
-                        issue_date: "2024-01-15",
-                        expiry_date: "2025-01-15",
-                        license_id: generateRandomHex(16),
-                        type: "standard",
-                        features: ["basic", "premium", "enterprise"],
-                        status: "VALID"
-                    };
-                    
-                    const statusIcon = extractedLicense.status === "VALID" ? "✅" : "❌";
-                    const statusClass = extractedLicense.status === "VALID" ? "success" : "error";
-                    
-                    showResult('verify-result', 
-                        `${statusIcon} License Verification Complete!\n\nStatus: ${extractedLicense.status}\n\nLicense Information:\n${JSON.stringify(extractedLicense, null, 2)}\n\nHash Verification: ✅ PASSED\nExpiry Check: ✅ VALID\nSignature: ✅ VERIFIED`, 
-                        statusClass);
-                }
-            }, 150);
-        }
+    function generateLicense() {
+      const name = document.getElementById('customer-name').value.trim();
+      const email = document.getElementById('customer-email').value.trim();
+      const days = document.getElementById('license-days').value;
+      const features = document.getElementById('license-features').value.split(',').map(f => f.trim());
+      let privateKey = document.getElementById('private-key-text').value.trim();
 
-        // Utility functions
-        function showResult(elementId, message, type = '') {
-            const element = document.getElementById(elementId);
-            element.style.display = 'block';
-            element.textContent = message;
-            element.className = `result-box ${type}`;
-        }
+      if (!name || !email) {
+        showResult('license-result', 'Please fill in customer name and email', 'error');
+        return;
+      }
+      if (!privateKey) {
+        showResult('license-result', 'Please provide a private key', 'error');
+        return;
+      }
 
-        function showProgress(elementId) {
-            document.getElementById(elementId).style.display = 'block';
-        }
+      showResult('license-result', 'Generating digital license...', '');
+      setTimeout(() => {
+        const issueDate = new Date().toISOString().split('T')[0];
+        const expiryDate = new Date(Date.now() + parseInt(days) * 86400000).toISOString().split('T')[0];
+        const licenseData = {
+          customer: { name, email },
+          issue_date: issueDate,
+          expiry_date: expiryDate,
+          license_id: generateRandomHex(16),
+          type: "standard",
+          features,
+          hash: generateRandomHex(64)
+        };
+        const encrypted = btoa(JSON.stringify(licenseData, null, 2));
+        generatedLicense = encrypted;
+        document.getElementById('download-license-btn').disabled = false;
+        showResult('license-result', 
+          `License generated successfully!\n\n${encrypted}`, 
+          'success');
+      }, 1000);
+    }
 
-        function hideProgress(elementId) {
-            document.getElementById(elementId).style.display = 'none';
-        }
+    function downloadLicense() {
+      if (!generatedLicense) return;
+      downloadFile(generatedLicense, 'license.dat');
+    }
 
-        function updateProgress(elementId, percent) {
-            const progressFill = document.querySelector(`#${elementId} .progress-fill`);
-            progressFill.style.width = percent + '%';
-        }
+    // QR Code Functions - For license data
+    function generateQRFromLicense() {
+      let licenseData = document.getElementById('license-text-qr').value.trim();
+      const fileInput = document.getElementById('license-file-qr');
+      
+      if (!licenseData && fileInput.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          licenseData = e.target.result;
+          generateQR('qrcode-display', licenseData, 'binaryBtn', 'qr-result');
+        };
+        reader.readAsText(fileInput.files[0]);
+      } else if (licenseData) {
+        generateQR('qrcode-display', licenseData, 'binaryBtn', 'qr-result');
+      } else {
+        showResult('qr-result', 'Please provide license data', 'error');
+      }
+    }
 
-        function downloadFile(content, filename) {
-            const element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
-            element.setAttribute('download', filename);
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-        }
+    // Simple QR Code Function
+    function generateSimpleQR() {
+      const text = document.getElementById('simpleTextInput').value.trim();
+      if (!text) {
+        showResult('simple-qr-result', 'Harap masukkan teks atau URL!', 'error');
+        return;
+      }
+      generateQR('simple-qrcode', text, 'simpleBinaryBtn', 'simple-qr-result');
+    }
 
-        // File input handlers
-        document.getElementById('private-key-file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('private-key-text').value = e.target.result;
-                };
-                reader.readAsText(file);
-            }
-        });
+    // Generic QR generator function
+    function generateQR(containerId, text, btnId, resultId) {
+      const qrcodeDiv = document.getElementById(containerId);
+      const binaryBtn = document.getElementById(btnId);
 
-        document.getElementById('license-file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('license-text').value = e.target.result;
-                };
-                reader.readAsText(file);
-            }
-        });
+      if (!text) {
+        showResult(resultId, 'Please provide text data first', 'error');
+        return;
+      }
 
-        document.getElementById('public-key-file-verify').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('public-key-text-verify').value = e.target.result;
-                };
-                reader.readAsText(file);
-            }
-        });
+      // Clear previous content
+      qrcodeDiv.innerHTML = '';
+      if (binaryBtn) binaryBtn.style.display = 'none';
+      
+      // Hide appropriate binary outputs based on which QR we're generating
+      if (containerId === 'qrcode-display') {
+        document.getElementById('binaryOutputContainer').style.display = 'none';
+      } else if (containerId === 'simple-qrcode') {
+        document.getElementById('simpleBinaryOutputContainer').style.display = 'none';
+      } else if (containerId === 'ascii-qrcode') {
+        document.getElementById('asciiQrBinaryOutputContainer').style.display = 'none';
+      }
 
-        // Update file input labels when files are selected
-        function updateFileInputLabel(inputId, labelText) {
-            const input = document.getElementById(inputId);
-            input.addEventListener('change', function(e) {
-                const label = this.nextElementSibling;
-                if (this.files[0]) {
-                    label.textContent = `📁 ${this.files[0].name}`;
-                    label.style.color = '#28a745';
-                } else {
-                    label.textContent = labelText;
-                    label.style.color = '#4facfe';
-                }
-            });
-        }
+      // Generate QR Code using QRCode library
+      try {
+        const qr = qrcode(0, 'L');
+        qr.addData(text);
+        qr.make();
+        
+        const canvas = document.createElement('canvas');
+const size = 250;
+canvas.width = size;
+canvas.height = size;
+const ctx = canvas.getContext('2d');
+const moduleSize = size / qr.getModuleCount();
 
-        // Initialize file input labels
-        updateFileInputLabel('private-key-file', '📁 Upload Private Key File');
-        updateFileInputLabel('license-file', '📄 Upload License File');
-        updateFileInputLabel('audio-file', '🎵 Upload WAV Audio File');
-        updateFileInputLabel('verify-audio-file', '🎵 Upload Audio File');
-        updateFileInputLabel('public-key-file-verify', '🔑 Upload Public Key File');
-    </script>
+// Draw QR code on canvas
+ctx.fillStyle = '#fff';
+ctx.fillRect(0, 0, size, size);
+ctx.fillStyle = '#000';
+
+for (let row = 0; row < qr.getModuleCount(); row++) {
+  for (let col = 0; col < qr.getModuleCount(); col++) {
+    if (qr.isDark(row, col)) {
+      ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize, moduleSize);
+    }
+  }
+}
+
+qrcodeDiv.appendChild(canvas);
+qrCanvases[containerId] = canvas;
+
+// Show binary conversion button
+if (binaryBtn) {
+  binaryBtn.style.display = 'inline-block';
+}
+
+// Show option to download QR code if this is the license QR
+if (containerId === 'qrcode-display') {
+  document.getElementById('download-qr-btn').disabled = false;
+}
+
+showResult(resultId, 'QR Code generated successfully!', 'success');
+} catch (error) {
+  showResult(resultId, 'Error generating QR code: ' + error.message, 'error');
+}
+}
+
+// Convert QR Code to Binary
+function convertQRToBinary(containerId) {
+  const canvas = qrCanvases[containerId];
+  if (!canvas) {
+    console.error('Canvas not found!');
+    return;
+  }
+  
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const { data, width } = imgData;
+  
+  let binaryString = '';
+  
+  // Convert image data to binary (1s and 0s)
+  for (let y = 0; y < width; y++) {
+    let rowBinary = '';
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      // If the pixel is dark (black or near black)
+      const isDark = data[idx] < 128;
+      rowBinary += isDark ? '1' : '0';
+    }
+    binaryString += rowBinary + '\n';
+  }
+  
+  // Display different outputs based on which QR code is being converted
+  let outputContainer;
+  let outputElement;
+  
+  if (containerId === 'qrcode-display') {
+    outputContainer = document.getElementById('binaryOutputContainer');
+    outputElement = document.getElementById('binaryOutput');
+  } else if (containerId === 'simple-qrcode') {
+    outputContainer = document.getElementById('simpleBinaryOutputContainer');
+    outputElement = document.getElementById('simpleBinaryOutput');
+  } else if (containerId === 'ascii-qrcode') {
+    outputContainer = document.getElementById('asciiQrBinaryOutputContainer');
+    outputElement = document.getElementById('asciiQrBinaryOutput');
+  }
+  
+  if (outputContainer && outputElement) {
+    outputElement.textContent = binaryString;
+    outputContainer.style.display = 'block';
+  }
+}
+
+// Copy binary data to clipboard
+function copyBinary(elementId) {
+  const textToCopy = document.getElementById(elementId).textContent;
+  navigator.clipboard.writeText(textToCopy)
+    .then(() => {
+      alert('Binary data copied to clipboard!');
+    })
+    .catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+}
+
+// Copy text from element
+function copyText(elementId) {
+  const textToCopy = document.getElementById(elementId).value;
+  navigator.clipboard.writeText(textToCopy)
+    .then(() => {
+      alert('Text copied to clipboard!');
+    })
+    .catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+}
+
+// Download QR Code as PNG
+function downloadQRCode() {
+  const canvas = qrCanvases['qrcode-display'];
+  if (!canvas) return;
+  
+  const dataURL = canvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = dataURL;
+  a.download = 'license_qr.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Converter functions
+function convertValues() {
+  const input = document.getElementById('converterInput').value.trim();
+  const inputType = document.querySelector('input[name="inputType"]:checked').value;
+  const outputType = document.querySelector('input[name="outputType"]:checked').value;
+  
+  if (!input) {
+    showResult('converter-result', 'Masukkan nilai untuk dikonversi!', 'error');
+    return;
+  }
+  
+  try {
+    let intermediateValue = '';
+    let outputValue = '';
+    
+    // Convert input to intermediate text form
+    switch (inputType) {
+      case 'text':
+        intermediateValue = input;
+        break;
+      case 'binary':
+        // Convert binary to text
+        intermediateValue = binaryToText(input);
+        break;
+      case 'decimal':
+        // Convert decimal to text
+        intermediateValue = decimalToText(input);
+        break;
+      case 'ascii':
+        // Convert ASCII numbers to text
+        intermediateValue = asciiToText(input);
+        break;
+    }
+    
+    // Convert from intermediate text to output format
+    switch (outputType) {
+      case 'text':
+        outputValue = intermediateValue;
+        document.getElementById('converterOutputText').style.display = 'block';
+        document.getElementById('converterOutput').value = outputValue;
+        document.getElementById('ascii-qrcode').style.display = 'none';
+        document.getElementById('asciiQrBinaryBtn').style.display = 'none';
+        break;
+      case 'binary':
+        outputValue = textToBinary(intermediateValue);
+        document.getElementById('converterOutputText').style.display = 'block';
+        document.getElementById('converterOutput').value = outputValue;
+        document.getElementById('ascii-qrcode').style.display = 'none';
+        document.getElementById('asciiQrBinaryBtn').style.display = 'none';
+        break;
+      case 'decimal':
+        outputValue = textToDecimal(intermediateValue);
+        document.getElementById('converterOutputText').style.display = 'block';
+        document.getElementById('converterOutput').value = outputValue;
+        document.getElementById('ascii-qrcode').style.display = 'none';
+        document.getElementById('asciiQrBinaryBtn').style.display = 'none';
+        break;
+      case 'ascii':
+        outputValue = textToAscii(intermediateValue);
+        document.getElementById('converterOutputText').style.display = 'block';
+        document.getElementById('converterOutput').value = outputValue;
+        document.getElementById('ascii-qrcode').style.display = 'none';
+        document.getElementById('asciiQrBinaryBtn').style.display = 'none';
+        break;
+      case 'qrcode':
+        // Generate QR code from the intermediate text value
+        document.getElementById('converterOutputText').style.display = 'none';
+        document.getElementById('ascii-qrcode').style.display = 'block';
+        document.getElementById('asciiQrBinaryBtn').style.display = 'block';
+        generateQR('ascii-qrcode', intermediateValue, 'asciiQrBinaryBtn', 'converter-result');
+        break;
+    }
+    
+    if (outputType !== 'qrcode') {
+      showResult('converter-result', 'Konversi berhasil!', 'success');
+    }
+  } catch (error) {
+    showResult('converter-result', 'Error konversi: ' + error.message, 'error');
+  }
+}
+
+// Helper functions for conversions
+function textToBinary(text) {
+  return text.split('').map(char => {
+    const binary = char.charCodeAt(0).toString(2);
+    return '0'.repeat(8 - binary.length) + binary;
+  }).join(' ');
+}
+
+function binaryToText(binary) {
+  // Remove spaces and split by 8 bits
+  const cleanBinary = binary.replace(/\s+/g, '');
+  const bytes = cleanBinary.match(/.{1,8}/g);
+  if (!bytes) return '';
+  
+  return bytes.map(byte => String.fromCharCode(parseInt(byte, 2))).join('');
+}
+
+function textToDecimal(text) {
+  return text.split('').map(char => char.charCodeAt(0)).join(' ');
+}
+
+function decimalToText(decimal) {
+  return decimal.split(/\s+/).map(num => {
+    const parsedNum = parseInt(num, 10);
+    if (isNaN(parsedNum)) return '';
+    return String.fromCharCode(parsedNum);
+  }).join('');
+}
+
+function textToAscii(text) {
+  return text.split('').map(char => char.charCodeAt(0)).join(' ');
+}
+
+function asciiToText(ascii) {
+  return ascii.split(/\s+/).map(num => {
+    const parsedNum = parseInt(num, 10);
+    if (isNaN(parsedNum)) return '';
+    return String.fromCharCode(parsedNum);
+  }).join('');
+}
+
+function embedLicense() {
+  const licenseField = document.getElementById('license-text').value.trim();
+  const licenseFile = document.getElementById('license-file');
+  const audioFile = document.getElementById('audio-file');
+  
+  if (!audioFile.files.length) {
+    showResult('embed-result', 'Please upload an audio file', 'error');
+    return;
+  }
+  
+  if (!licenseField && !licenseFile.files.length) {
+    showResult('embed-result', 'Please provide license data', 'error');
+    return;
+  }
+  
+  showResult('embed-result', 'Processing audio and embedding license...', '');
+  document.getElementById('embed-progress').style.display = 'block';
+  
+  // Simulate progress
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 5;
+    document.querySelector('#embed-progress .progress-fill').style.width = progress + '%';
+    if (progress >= 100) {
+      clearInterval(interval);
+      document.getElementById('download-audio-btn').disabled = false;
+      embeddedAudio = 'data:audio/wav;base64,' + btoa('SIMULATED_EMBEDDED_AUDIO');
+      showResult('embed-result', 'License successfully embedded in audio file!', 'success');
+    }
+  }, 300);
+}
+
+function downloadAudio() {
+  if (!embeddedAudio) return;
+  
+  const a = document.createElement('a');
+  a.href = embeddedAudio;
+  a.download = 'license_embedded.wav';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function verifyLicense() {
+  const audioFile = document.getElementById('verify-audio-file');
+  const publicKeyField = document.getElementById('public-key-text-verify').value.trim();
+  const publicKeyFile = document.getElementById('public-key-file-verify');
+  
+  if (!audioFile.files.length) {
+    showResult('verify-result', 'Please upload an audio file', 'error');
+    return;
+  }
+  
+  if (!publicKeyField && !publicKeyFile.files.length) {
+    showResult('verify-result', 'Please provide a public key', 'error');
+    return;
+  }
+  
+  showResult('verify-result', 'Extracting and verifying license from audio...', '');
+  document.getElementById('verify-progress').style.display = 'block';
+  
+  // Simulate progress
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 10;
+    document.querySelector('#verify-progress .progress-fill').style.width = progress + '%';
+    if (progress >= 100) {
+      clearInterval(interval);
+      
+      // Simulate verification result - randomize between valid and invalid
+      const isValid = Math.random() > 0.3;
+      
+      if (isValid) {
+        const sampleLicenseData = {
+          customer: { name: "John Doe", email: "john@example.com" },
+          issue_date: "2023-09-01",
+          expiry_date: "2024-09-01",
+          license_id: generateRandomHex(16),
+          type: "standard",
+          features: ["basic", "premium", "enterprise"],
+          hash: generateRandomHex(64)
+        };
+        
+        showResult('verify-result', 
+          `✅ License verified successfully!\n\nLicense Details:\n${JSON.stringify(sampleLicenseData, null, 2)}`, 
+          'success');
+      } else {
+        showResult('verify-result', 
+          '❌ Failed to verify license. The signature does not match or the license is invalid.', 
+          'error');
+      }
+    }
+  }, 200);
+}
+
+// Utility functions
+function showResult(elementId, message, type = '') {
+  const resultBox = document.getElementById(elementId);
+  resultBox.textContent = message;
+  resultBox.style.display = 'block';
+  
+  // Reset all classes
+  resultBox.classList.remove('success', 'error', 'warning');
+  
+  // Add appropriate class
+  if (type) resultBox.classList.add(type);
+}
+
+function downloadFile(content, filename) {
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Event listeners for file inputs
+document.getElementById('private-key-file').addEventListener('change', function() {
+  if (this.files.length) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('private-key-text').value = e.target.result;
+    };
+    reader.readAsText(this.files[0]);
+  }
+});
+
+document.getElementById('license-file-qr').addEventListener('change', function() {
+  if (this.files.length) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('license-text-qr').value = e.target.result;
+    };
+    reader.readAsText(this.files[0]);
+  }
+});
+
+document.getElementById('license-file').addEventListener('change', function() {
+  if (this.files.length) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('license-text').value = e.target.result;
+    };
+    reader.readAsText(this.files[0]);
+  }
+});
+
+document.getElementById('public-key-file-verify').addEventListener('change', function() {
+  if (this.files.length) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('public-key-text-verify').value = e.target.result;
+    };
+    reader.readAsText(this.files[0]);
+  }
+});
+
+// Add listener for conversion type changes
+document.querySelectorAll('input[name="outputType"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    if (this.value === 'qrcode') {
+      document.getElementById('converterOutputText').style.display = 'none';
+    } else {
+      document.getElementById('converterOutputText').style.display = 'block';
+      document.getElementById('ascii-qrcode').style.display = 'none';
+      document.getElementById('asciiQrBinaryBtn').style.display = 'none';
+    }
+  });
+});
+</script>
 </body>
 </html>

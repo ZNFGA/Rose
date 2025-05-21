@@ -3,3 +3,7 @@ scipy>=1.5.0
 tinyec>=0.3.0
 pycryptodome>=3.10.1
 Flask>=2.0.0
+qrcode
+pillow
+opencv-python
+pyzbar
